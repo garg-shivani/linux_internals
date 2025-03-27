@@ -1,159 +1,116 @@
-/*
-NAME : Shivani Garg
-DATE : 28/02/2025
-DESCRIPTION :A01 - Implement a cp(copy) command with –p option
-SAMPLE I/P AND O/P:
-Pre-requisites:
-
-Knowledge about system calls, How to read and understand ‘man pages’.
-Command line arguments, File operation system calls (open, read, write, close, fstat ..etc
-
-Objective:
-   To understand and implement using basic system calls
-
-Requirements:
-
-Copy source file to destination file which passed through cmd-line arguments. After copying both files  must have equal size, even it’s a zero sized file.  Eg:  ./my_copy source.txt dest.txt
-If arguments are missing show the usage (help) info to use
-Implement a my_copy() function where you have to pass two file descriptors. Int my_copy(int source_fd, int dest_fd);
- If –p option passed copy permissions as well to destination (refer ‘fstat’ man page).  Eg: - ./my_copy –p source.txt dest.txt.
-If the destination file is not present then create a new one with given name. In case if it is present show a confirmation from user to overwrite. Eg: - ./my_copy source.txt destination.txt .File  “destination.txt” is already exists. Do you want to overwrite (Y/n)
-If user type ‘Y/n’ or enter key overwrite the destination with new file. In n/N don’t overwrite and exit from program.
-Program should able handle all possible error conditions.
-
-Sample execution:
-
-When no arguments are passed ./my_copy Insufficient arguments
-Usage:- ./my_copy [option]
-When destination file is not exists ./my_copy source.txt dest.txt . New dest.txt file is created and source.txt file will be copied to dest.txt file
- When destination file exists ./my_copy source.txt dest.txt File “dest.txt” is already exists. Do you want to overwrite (Y/n)
-When –p option passed ./my_copy –p source.txt dest.txt Permissions also copied from source file to destination file
-*/
-
-#include "main.h" 
-int copy_con(int , int );
-int main(int argc,char *argv[])
+#include "main.h"
+int check_file_exist(char* file)
 {
-    
-    int s_fd, d_fd, read_len;
-	char choice;
+    struct stat buffer;
+    return (stat(file, &buffer));
+}
+int my_copy(int source_fd, int dest_fd)
+{
+    char buffer[4096];// ereading 4 KB memmory
+    size_t bytes_read;
+   while( (bytes_read = read(source_fd, &buffer,sizeof(buffer))) > 0)
+   {
+        write(dest_fd, &buffer , sizeof(buffer));
+   }
+   return 0;
+}
 
-	//for -p to copy the permission mode
-	struct stat sb;
+int prompt_overwrite()
+{
+    char ch;
+    printf("Do you want to overwrite (Y/n)? ");
+    scanf(" %c", &ch);
+    return (ch == 'Y' || ch == 'y');
+}
 
-   if (argc < 3)
+int open_dest_file(char* dest, int overwrite)
+{
+    if(overwrite)
     {
-        printf("Insufficient arguments\n");
-		printf("Usage:- ./my_copy [option] <source file> <destination file> \n");
-        printf("please pass valid command line arguments\n");
-        return -1;
+        return open(dest, O_WRONLY | O_TRUNC);
     }
-	/* check for -p permissions */
-	if (strcmp(argv[1], "-p") == 0 )
-	{
-		printf("Permissions also copied from source file to destination file.\n");
-		/* To open source.txt to read */
-		if ( (s_fd = open(argv[2], O_RDONLY)) == -1 )
-		{
-			perror("open");
-			return -1;
-		}
-
-		//get the permission of this file
-		//stat(argv[2], &sb);
-		if (stat(argv[2], &sb) )
-		{
-			perror("stat");
-			return -1;
-		}
-
-		/* To create/ open dest.txt to copy the data */
-        //d_fd = open(argv[2],O_CREAT | O_EXCL | O_WRONLY);
-		if ( (d_fd = open(argv[3], O_WRONLY | O_CREAT | O_TRUNC, 0664)) == -1 )
-		{
-
-			printf("File %s is already exists.\n Do you want to overwrite (y/n): ", argv[2]);
-			scanf("%c", &choice);
-
-			if(choice == 'n' || choice == 'N')
-			{
-				return 0;
-			}
-			else if (choice == 'y' || choice == 'Y')
-			{
-				//for overwriting
-				if ( (d_fd = creat(argv[3], 0664)) == -1 )
-				{
-					perror("open");
-					return -1;
-				}
-			}
-
-		}
-		//change the permisions
-		if (chmod(argv[3], sb.st_mode & 0777))   		
-        {
-        	perror("chmod");
-			return -1;    		
-        }
-	
+    else{
+        return open(dest, O_WRONLY | O_CREAT | O_EXCL, 0666);
     }
-    else            
-    {      
-        // read the 1 arg file content                  
-        s_fd = open(argv[1],O_RDONLY);
-        
-        if(s_fd == -1)
-        {
-            printf("error : Please pass the source file\n");       
-            return -1;
-        }
-        // write the content to 1st arg file to 2nd arg file
-        d_fd = open(argv[2],O_CREAT | O_EXCL | O_WRONLY);
-    
-        if(d_fd == -1)
-        {
-            printf("File %s is already exists.\nDo you want to overwrite (y/n): ", argv[2]);                    
-            // read choice from user
-            scanf("%c",&choice);          
-            if(choice == 'y' || choice == 'y')
-            {
-                d_fd = open(argv[2], O_TRUNC | O_WRONLY);
-            }
-            else if(choice == 'n' || choice == 'N')
-            {
-                return -1;
-            }
-        }
-    }     
-    // function call                   
-    copy_con(s_fd,d_fd);      			
-    close(s_fd);			
-    close(d_fd);            
-    return 0;
-}   
-//copy the data from source file to destination   
-int copy_con(int s_fd, int d_fd)   
+}
+int main(int argc, char* argv[])
 {
-	    
-    int read_len = 0;	    
-    char buff[BUFF_SIZE];
-	   
-    //read the data from the source.txt till end and copy	    
-    while( ((read_len = read(s_fd, buff, BUFF_SIZE)) != -1 ) && (read_len != 0) )	    
-    {		    
-        if( write(d_fd, buff, read_len) == -1 )		    
-        {			    
-            close(s_fd);			    
-            close(d_fd);			    
-            return -1;		    
+    int src_fd = -1, dest_fd = -1;
+    int s = 1,d = 2;
+    int preserve_mode = 0;
+    int overwrite = 0;
+    umask(0022);//set the default file creation mask
+    
+
+    if(argc == 3)
+    {
+        s = 1;
+        d = 2;
+    }
+    else if(argc == 4 && strcmp(argv[1], "-p" ) == 0)
+    {
+        
+        s = 2;
+        d = 3;
+        preserve_mode = 1;
+    }
+    else
+    {
+        printf("Usage: ./my_copy [option] source_file destination file\n");
+        return 0;
+    }
+
+
+    if(check_file_exist(argv[s]) != 0)
+    {
+        printf("Source file doesnot exist.\n");
+        return 1;
+    }
+    src_fd = open(argv[s], O_RDONLY);
+    if(src_fd <0)
+    {
+        perror("Error opening source file");
+        return 1;
+    }
+
+    if(check_file_exist(argv[d]) == 0)
+    {
+        if(!prompt_overwrite())
+        {
+            close(src_fd);
+            return 0;
         }
-	    
-    }        
-    // to check file content present are not        
-    if(d_fd =! NULL)        
-    {            
-        printf("Success : file contents are copied\n");        
-    }    
-    return 0;       
+        else
+        {
+            overwrite = 1;
+        } 
+    }
+    dest_fd = open_dest_file(argv[d], overwrite);
+    if(dest_fd < 0)
+    {
+        perror("Error opening destination file");
+        close(src_fd);
+        return 1;
+    }
+    if(preserve_mode)
+    {
+        struct stat src_stat;
+        if(fstat(src_fd, &src_stat) == 0)
+        {
+            fchmod(dest_fd, src_stat.st_mode);
+        }
+    }
+    //below code is for copying th efile from fike descriptors
+    if(my_copy( src_fd, dest_fd) == 0)
+    {
+        printf("File copied successfully\n");
+    }
+    else
+    {
+        printf("File not copied\n");
+    }
+    close(src_fd);
+    close(dest_fd);
+    
+    return 0;
 }
