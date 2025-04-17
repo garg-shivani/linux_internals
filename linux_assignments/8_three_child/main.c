@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 // #include <sys/wait.h>
 
 // int main() {
-//     printf("Parent (PID:%d) starts\n", getpid());
+//     printf("Parent (PID:%d) starts\n", getpid());s
 
 //     // Create 3 children
 //     for (int i = 1; i <= 3; i++) {
