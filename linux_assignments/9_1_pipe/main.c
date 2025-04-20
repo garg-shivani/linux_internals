@@ -101,10 +101,7 @@ int main(int argc, char*argv[])
     //parent process
     close(pipefd[0]);
     close(pipefd[1]);
-
     waitpid(c1, NULL, 0);
     waitpid(c2, NULL, 0);
-
-
     return 0;
 }
