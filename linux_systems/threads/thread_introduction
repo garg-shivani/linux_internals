@@ -1,0 +1,10 @@
+Threads:
+    light wiegth process , which will excute diff
+    parts of the sam eprocess parallely or cincurrently.
+    ->Different oatrs--> Different fucntions
+
+int main()   
+{
+    foo1();
+    foo2();
+} 

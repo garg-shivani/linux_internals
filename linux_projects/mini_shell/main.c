@@ -78,6 +78,46 @@ Eg: ls | wc, ls -l /dev | grep tty | wc -l
 */
 
 #include "main.h"
+/*
+1.prompt (customisable input)
+2. External command
+3. Internal command
+4. Special variables : echo$?--return value of previous program, echo $$-- pid of the Shell, echo $SHELL
+path of the shell executable
+
+*/
+extern int last_return_value;
+void echo(char* input)
+{
+    //input :\echo $$
+    /*display the pid of mini shell (getpid())*/
+    //inout $? --> print teh return value of previosu program
+    //$SHELL ->print the nameof teh minshell (get_current_dir_name())
+    //echo with nay string --> print that string
+    char* args = input + 5;
+    while(*args == ' ')args++;
+    //check the special tokens 
+    if(strcmp(args, "$$") == 0)
+    {
+        printf("%d\n", getpid());
+    }
+    else if(strcmp(args, "$$") == 0)
+    {
+        printf("%d\n", last_return_value);
+    }
+    else if(strcmp(args, "$SHELL"))
+    {
+        char* path = get_current_dir_name();
+        if(path){
+            printf("%s\n", path);
+            free(path);
+        }
+    }
+    else
+    {
+        printf("%s\n", args);
+    }
+}
 void main()
 {
     char input[50], prompt[50] = "minishell$";
@@ -86,7 +126,7 @@ void main()
     {
         printf("%s", prompt);
         fgets(input, 50, stdin);
-        input[strlen(input) -1] = 0;
+        input[strcspn(input, "\n")] = 0; 
         if(!strcmp(input, "exit"))
         {
             return SUCCESS;

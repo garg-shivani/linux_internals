@@ -1,0 +1,22 @@
+/********************************************* 
+/pthread_self()
+//pthread_exit()
+//int pthread_cancel(thread): It is used to set termination request to the thread
+//pthread_setcancelstate(): It is used to change the cancel state , we can enable or disable the
+    //cancel state of calling thread.
+pthread_setcanceltype(): Used to change the termination type
+
+*****************************************************/
+
+// Cancel state:
+// 1. Enabled : Thread will receive cancellation request and it will get terminated
+// Two types of termination:
+// Asynchronous-->At any time 
+// Deferred: ->cancellation point (read, write, sleep);
+//     man 7 threads
+// 2. Disabled:
+//     cancel request will not be recevied by the thread, it will be blocked untill 
+//     it is enabled 
+
+
+

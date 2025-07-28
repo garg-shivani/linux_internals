@@ -1,9 +1,9 @@
 #include "main.h"
 #define MAX_ARGS 100
-void execute_external_commands(char* input)
+int execute_external_command(char* input)
 {
     char *cmd[MAX_ARGS];
-    int i =0;
+    int i =0, exit_val;
     //tokenize inut into cmd[]
     char* token = strtok(input, " \t\n");
     while(token != NULL && i< MAX_ARGS -1)
@@ -35,16 +35,17 @@ void execute_external_commands(char* input)
         }
         if(WIFEXITED(status))
         {
-            printf("Child terminating with value %d\n", ret, WEXITSTATUS(status));
+            printf("Child terminating with value %d\n", ret,(exit_val = WEXITSTATUS(status)));
         }
         else if(WIFSIGNALED(status))
         {
-            printf("Child terminated abnormally by receiving signal %d\n", WTERMSIG(status));
+            printf("Child terminated abnormally by receiving signal %d\n", (exit_val =WTERMSIG(status)));
         }
         else if(WIFSTOPPED(status))
         {
-            printf("Child %d stopped by receiving signal %d\n", WSTOPSIG(status));
+            printf("Child %d stopped by receiving signal %d\n",(exit_val = WSTOPSIG(status)));
         }
+        return exit_val +=128;
         
     }
     else

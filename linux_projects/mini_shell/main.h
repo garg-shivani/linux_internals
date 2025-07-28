@@ -12,6 +12,8 @@
 #define EXTERNAL 0
 #define INTERNAL 1
 #define ECHO 2
-void execute_external_commands(char* input);
+void execute_external_command(char* input);
 void execute_internal_command(char* input);
+int check_command_type(char* input);
+void signal_handler(int sig_num);
 #endif
