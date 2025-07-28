@@ -24,3 +24,16 @@ execute_internal_command(char* input)
   else   if(!strcmp(command, "bg")
   {}
 }
+
+#include "main.h"
+void execute_internal_command(char* input)
+{
+    //1. cd 2. exit 3. pwd 4. jobs 5. fg 6. bg
+    //cd == int chdir(const char *path)
+    //pwd==> char* get_current_dir_name(void);
+    //jobs ==> Display pending processes with teh status
+    //fg ==> Resume the recently stopped prpcess in the foreground
+    //bg ==> Resume the recently stopped process in the background
+    
+    
+}

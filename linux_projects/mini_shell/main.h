@@ -12,4 +12,6 @@
 #define EXTERNAL 0
 #define INTERNAL 1
 #define ECHO 2
+void execute_external_commands(char* input);
+void execute_internal_command(char* input);
 #endif
