@@ -86,38 +86,7 @@ Eg: ls | wc, ls -l /dev | grep tty | wc -l
 path of the shell executable
 
 */
-extern int last_return_value;
-void echo(char* input)
-{
-    //input :\echo $$
-    /*display the pid of mini shell (getpid())*/
-    //inout $? --> print teh return value of previosu program
-    //$SHELL ->print the nameof teh minshell (get_current_dir_name())
-    //echo with nay string --> print that string
-    char* args = input + 5;
-    while(*args == ' ')args++;
-    //check the special tokens 
-    if(strcmp(args, "$$") == 0)
-    {
-        printf("%d\n", getpid());
-    }
-    else if(strcmp(args, "$$") == 0)
-    {
-        printf("%d\n", last_return_value);
-    }
-    else if(strcmp(args, "$SHELL"))
-    {
-        char* path = get_current_dir_name();
-        if(path){
-            printf("%s\n", path);
-            free(path);
-        }
-    }
-    else
-    {
-        printf("%s\n", args);
-    }
-}
+
 char input[50], prompt[50] = "minishell$";
 void main(int argc, char* argv[])
 {
